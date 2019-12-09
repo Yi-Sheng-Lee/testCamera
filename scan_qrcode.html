@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/vue-qrcode-reader@2.0.3/dist/vue-qrcode-reader.browser.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/vue-qrcode-reader@2.0.3/dist/vue-qrcode-reader.css">
+  <style>
+    .container{width: 100%; max-width: 600px; margin: auto;}
+    form {
+      width: 450px; 
+      max-width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+    .input_container{
+      position: relative;
+      margin-top: 20px;
+    }
+    .input_container label {
+     
+      color: #0a2051;
+      font-size: 28px;
+      font-weight: bold;
+      line-height: 60px;
+      transition: all 0.2s ease;
+    }
+    .input_container input {
+      width: 100%;
+      height: 36px;
+      font-size: 19px;
+      border: none;
+      background: transparent;
+      padding-left: 5px;
+      border-radius: 0;
+      -webkit-border-radius: 0;
+      border-bottom: 1px solid #6d6d6d;
+      outline: none;
+    }
+    .alert-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      font-size: 160%;
+      font-family: Microsoft JhengHei;
+      max-width: 1140px;
+    }
+
+    .alert-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      font-size: 160%;
+      font-family: Microsoft JhengHei;
+      max-width: 1140px;
+    }
+
+    .alert-secondary {
+      color: #383d41;
+      background-color: #e2e3e5;
+      border-color: #d6d8db;
+      font-size: 160%;
+      font-family: Microsoft JhengHei;
+      max-width: 1140px;
+    }
+    @media(max-width: 768px){
+      .input_container label {
+        font-size: 20px;
+        line-height: 40px;
+      }
+    }
+  </style>
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">
+    <div class="container">
+      <form action="./check_duplicate.php" method="POST" id="exhi_scan_form">
+        <div class="input_container">
+          <label for="#duplicate_id">簡訊代號</label>
+          <input type="text" name="duplicate_id" value="17" readonly>
+        </div>
+        <div class="input_container">
+          <label for="#exhibit_id">展覽代號</label>
+          <input type="text" name="exhibit_id" value="836" readonly>
+        </div>
+        <div class="input_container">
+          <label for="#data">QRcode代號</label>
+          <input type="text" name="data" :value="decodedContent" autofocus placeholder="請掃描Qrcode或輸入手機號碼">
+        </div>
+      </form>
+      <p>Last result: <b>{{ decodedContent }}</b></p>
+      <p class="error">{{ errorMessage }}</p>
+      <qrcode-stream @decode="onDecode" @init="onInit"></qrcode-stream>
+      
+    </div>
+  </div>
+</body>
+<script>
+  new Vue({
+    el: '#app',
+
+    data() {
+      return {
+        decodedContent: '',
+        errorMessage: ''
+      }
+    },
+    watch: {
+      
+    },
+    methods: {
+      onDecode(content) {
+        this.decodedContent = content;
+      },
+
+      onInit(promise) {
+        promise.then(() => {
+          console.log('Successfully initilized! Ready for scanning now!');
+        })
+        .catch(error => {
+          switch (error.name){
+            case "NotAllowedError":
+              this.errorMessage = '請授權使用相機功能';
+              break;
+            case "NotFoundError":
+              this.errorMessage = '偵測不到相機';
+              break;
+            case "NotSupportedError":
+              this.errorMessage = '處於非安全模式，請使用https';
+              break;
+            case "NotReadableError":
+              this.errorMessage = 'Couldn\'t access your camera. Is it already in use?';
+              break;
+            case "OverconstrainedError":
+              this.errorMessage = 'Constraints don\'t match any installed camera. Did you asked for the front camera although there is none?';
+              break;
+            default: 
+              this.errorMessage = 'UNKNOWN ERROR: ' + error.message;
+          }
+        })
+      }
+    }
+  })
+
+</script>
+
+</html>
