@@ -95,9 +95,11 @@
           <input type="text" name="data" :value="decodedContent" autofocus placeholder="請掃描Qrcode或輸入手機號碼">
         </div>
       </form>
-      <p>Last result: <b>{{ decodedContent }}</b></p>
-      <p class="error">{{ errorMessage }}</p>
-      <qrcode-stream @decode="onDecode" @init="onInit"></qrcode-stream>
+      <center>
+        <p>Last result: <b>{{ decodedContent }}</b></p>
+        <p class="error">{{ errorMessage }}</p>
+      </center>
+      <qrcode-stream style="width: 50%; margin: auto;" @decode="onDecode" @init="onInit"></qrcode-stream>
       
     </div>
   </div>
